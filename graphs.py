@@ -47,6 +47,7 @@ def dfs(graph, start, goal, path=None, visited=None):
 def ucs(graph, start, goal):
     pq = PriorityQueue()
     pq.put((0, [start]))  # (cost, path)
+    visited = set()
 
     while not pq.empty():
         (cost, path) = pq.get()
@@ -55,10 +56,12 @@ def ucs(graph, start, goal):
         if node == goal:
             return path
 
-        for (neighbor, weight) in graph.get(node, []):
-            new_cost = cost + weight
-            new_path = path + [neighbor]
-            pq.put((new_cost, new_path))
+        if node not in visited:
+            visited.add(node)
+            for (neighbor, weight) in graph.get(node, []):
+                new_cost = cost + weight
+                new_path = path + [neighbor]
+                pq.put((new_cost, new_path))
 
     return None
 
@@ -83,7 +86,8 @@ def greedy_bfs(graph, start, goal, heuristics):
 # A* algorithm
 def a_star(graph, start, goal, heuristics):
     pq = PriorityQueue()
-    pq.put((0 + heuristics[start], 0, [start]))
+    pq.put((0 + heuristics[start], 0, [start]))  # (estimated_cost, cost, path)
+    visited = set()
 
     while not pq.empty():
         (estimated_cost, cost, path) = pq.get()
@@ -92,10 +96,12 @@ def a_star(graph, start, goal, heuristics):
         if node == goal:
             return path
 
-        for (neighbor, weight) in graph.get(node, []):
-            new_cost = cost + weight
-            new_path = path + [neighbor]
-            estimated_cost = new_cost + heuristics[neighbor]
-            pq.put((estimated_cost, new_cost, new_path))
+        if node not in visited:
+            visited.add(node)
+            for (neighbor, weight) in graph.get(node, []):
+                new_cost = cost + weight
+                new_path = path + [neighbor]
+                estimated_cost = new_cost + heuristics[neighbor]
+                pq.put((estimated_cost, new_cost, new_path))
 
     return None
